@@ -64,7 +64,7 @@ const Navbar = () => {
             <ul className="flex space-x-8 text-blue-900 font-semibold text-lg">
               <li className="cursor-pointer">
                 {user ? (
-                  <Link to="/viewLocations" className="hover:text-green-500">
+                  <Link to="/MapView" className="hover:text-green-500">
                     Family
                   </Link>
                 ) : (
@@ -105,7 +105,7 @@ const Navbar = () => {
             <ul className="pt-4 space-y-4 text-blue-900 font-semibold text-lg">
               <li className="cursor-pointer">
                 {user ? (
-                  <Link to="/viewLocations" className="block hover:text-green-500" onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="/MapView" className="block hover:text-green-500" onClick={() => setMobileMenuOpen(false)}>
                     Family
                   </Link>
                 ) : (

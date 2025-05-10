@@ -128,8 +128,8 @@ const GroupPage = () => {
 
       // Save groupId to user profile
       const userRef = doc(db, 'users', auth.currentUser.uid);
-      await setDoc(userRef, { currentGroupId: groupDoc.id }, { merge: true });
-
+     // await updateDocDoc(userRef, { currentGroupId: groupDoc.id }, { merge: true });//vs
+     await updateDoc(userRef, { currentGroupId: groupDoc.id });
       showMessage(`Successfully joined group "${joinGroupName}"!`, 'success');
       setJoinGroupName('');
       setJoinPassword('');
@@ -190,11 +190,7 @@ const GroupPage = () => {
             {['create', 'join'].map((tab) => (
               <button
                 key={tab}
-                className={`flex-1 py-4 px-6 font-medium text-lg text-center ${
-                  activeTab === tab
-                    ? 'bg-green-50 text-green-700 border-b-2 border-green-500'
-                    : 'text-gray-500 hover:text-green-500 hover:bg-green-50'
-                }`}
+                className={`flex-1 py-4 px-6 font-medium text-lg text-center ${activeTab === tab ? 'bg-green-50 text-green-700 border-b-2 border-green-500' : 'text-gray-500 hover:text-green-500 hover:bg-green-50'}`}
                 onClick={() => setActiveTab(tab)}
               >
                 <div className="flex items-center justify-center">
@@ -295,14 +291,15 @@ const GroupPage = () => {
         </div>
 
         {message && (
-          <div
-            className={`flex items-center justify-between p-4 rounded-lg border-l-4 ${getMessageColor()}`}
-          >
+          <div className={`flex items-center justify-between p-4 rounded-lg border-l-4 ${getMessageColor()}`}>
             <div className="flex items-center">
               {getMessageIcon()}
-              <p className="ml-3">{message}</p>
+              <span className="ml-2">{message}</span>
             </div>
-            <button onClick={() => setMessage('')} className="text-gray-400 hover:text-gray-600">
+            <button
+              onClick={() => setMessage('')}
+              className="text-lg text-gray-600 hover:text-gray-800"
+            >
               <X size={20} />
             </button>
           </div>

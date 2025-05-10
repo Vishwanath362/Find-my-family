@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { db } from '../firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { db, auth } from '../firebase'; // Assuming you have auth initialized in firebase
+import { doc, getDoc } from 'firebase/firestore'; // Import Firestore methods
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -17,42 +17,51 @@ L.Icon.Default.mergeOptions({
 });
 
 const MapView = () => {
-  const [locations, setLocations] = useState([]);  // State to hold all locations
+  const [locations, setLocations] = useState([]);  // State to hold group members' locations
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchLocations = async () => {
+    const fetchGroupData = async () => {
       try {
-        // Change the collection to 'group' instead of 'users'
-        const querySnapshot = await getDocs(collection(db, 'groups'));  // Fetch all groups from Firestore
-        const locationsArray = [];
-
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.locations && data.locations.length > 0) {
-            // Push all location data from the 'group' collection
-            data.locations.forEach(location => {
-              locationsArray.push({
-                name: data.name,  // Assuming name is stored in the group document
-                latitude: location.latitude,
-                longitude: location.longitude,
-              });
-            });
-          }
-        });
-
-        setLocations(locationsArray);
+        // Get the current user
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        const groupId = userSnap.data().currentGroupId;
+  
+        if (!groupId) {
+          setError('You are not part of any group.');
+          setLoading(false);
+          return;
+        }
+  
+        // Get the group data using the group ID
+        const groupRef = doc(db, 'groups', groupId);
+        const groupSnap = await getDoc(groupRef);
+        const groupData = groupSnap.data();
+  
+        if (groupData && groupData.locations) {
+          // Locations are already stored in the group document
+          const groupLocations = groupData.locations.map(location => ({
+            name: location.name,
+            latitude: location.latitude,
+            longitude: location.longitude,
+          }));
+          setLocations(groupLocations);
+        }
       } catch (err) {
-        console.error('Error fetching locations:', err);
+        console.error('Error fetching group data:', err);
         setError('Failed to load location data');
       } finally {
         setLoading(false);
       }
     };
-
-    fetchLocations();
+  
+    fetchGroupData();
   }, []);
+  
+
+
 
   if (loading) {
     return <div className="text-center mt-10 text-gray-600">Loading map...</div>;
@@ -63,7 +72,7 @@ const MapView = () => {
   }
 
   if (locations.length === 0) {
-    return <div className="text-center mt-10 text-gray-600">No location data available</div>;
+    return <div className="text-center mt-10 text-gray-600">No location data available for group members</div>;
   }
 
   return (
