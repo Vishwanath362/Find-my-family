@@ -11,22 +11,26 @@ import ShareLocation from './LoggedInUser/ShareLocation';
 import MapView from './LoggedInUser/MapView';
 import ViewLocations from './LoggedInUser/ViewLocations';  // Import the new component
 import Group from './LoggedInUser/Group';
-
+import AboutUs from './Components/AboutUs';
+// import AboutUs from './Components/AboutUs';
 function App() {
   return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/shareLocation" element={<ShareLocation />} />
-        <Route path="/Group" element={<Group />} />
-        <Route path="/MapView" element={<MapView />} />
-        <Route path="/viewLocations" element={<ViewLocations />} /> {/* Add this route */}
-        <Route path="/" element={<><Hero /><Features /><Testimonials /></>} />
-      </Routes>
-      <Footer />
-    </Router>
+    <div className="font-sans"> {/* Apply font-sans (Inter, if added via Tailwind config) */}
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/shareLocation" element={<ShareLocation />} />
+          <Route path="/Group" element={<Group />} />
+          <Route path="/MapView" element={<MapView />} />
+          <Route path="/viewLocations" element={<ViewLocations />} />
+          <Route path="/AboutUs" element={<AboutUs />} />
+          <Route path="/" element={<><Hero /><Features /><Testimonials /></>} />
+        </Routes>
+        <Footer />
+      </Router>
+    </div>
   );
 }
 

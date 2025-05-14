@@ -6,20 +6,20 @@ import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const extractUsernameSingleLine = (email) => email.includes('@') ? email.substring(0, email.indexOf('@')) : email;
-  
+
   const [user, setUser] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
     });
-    
+
     return () => unsubscribe();
   }, []);
-  
+
   const navigate = useNavigate();
-  
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -29,11 +29,11 @@ const Navbar = () => {
       console.log('Error during sign out:', error);
     }
   };
-  
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
-  
+
   return (
     <header className="bg-slate-100 shadow-md">
       <nav className="container mx-auto px-4 py-4">
@@ -44,9 +44,9 @@ const Navbar = () => {
               My Family App
             </h3>
           </Link>
-          
+
           {/* Mobile menu button */}
-          <button 
+          <button
             className="block sm:hidden text-gray-800 focus:outline-none"
             onClick={toggleMobileMenu}
           >
@@ -58,7 +58,7 @@ const Navbar = () => {
               )}
             </svg>
           </button>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden sm:flex items-center space-x-8">
             <ul className="flex space-x-8 text-blue-900 font-semibold text-lg">
@@ -74,9 +74,14 @@ const Navbar = () => {
                 )}
               </li>
               <li className="cursor-pointer hover:text-green-500">Friends</li>
-              <li className="cursor-pointer hover:text-green-500">About Us</li>
+              <li className="cursor-pointer">
+                <Link to="/AboutUs" className="hover:text-green-500">
+                  About Us
+                </Link>
+              </li>
+
             </ul>
-            
+
             <div className="flex items-center space-x-4">
               {user ? (
                 <>
@@ -98,7 +103,7 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Mobile menu dropdown */}
         {mobileMenuOpen && (
           <div className="sm:hidden mt-4 pb-2 border-t border-gray-300">
@@ -109,8 +114,8 @@ const Navbar = () => {
                     Family
                   </Link>
                 ) : (
-                  <span 
-                    className="block hover:text-green-500" 
+                  <span
+                    className="block hover:text-green-500"
                     onClick={() => {
                       navigate("/login");
                       setMobileMenuOpen(false);
@@ -126,12 +131,14 @@ const Navbar = () => {
                 </span>
               </li>
               <li className="cursor-pointer">
-                <span className="block hover:text-green-500" onClick={() => setMobileMenuOpen(false)}>
-                  About Us
-                </span>
+                <Link to="/AboutUs">
+                  <span className="block hover:text-green-500" onClick={() => setMobileMenuOpen(false)}>
+                    About Us
+                  </span>
+                </Link>
               </li>
             </ul>
-            
+
             <div className="mt-6 pt-4 border-t border-gray-300">
               {user ? (
                 <div className="space-y-3">

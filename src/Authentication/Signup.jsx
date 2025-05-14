@@ -18,7 +18,7 @@ const Signup = () => {
       localStorage.setItem('authToken', user.accessToken);
       navigate('/');
     } catch (error) {
-      setErrorMessage(error.message || 'Something went wrong');
+      setErrorMessage('Something went wrong');
     }
   };
 

@@ -4,6 +4,8 @@ import { doc, getDoc } from 'firebase/firestore'; // Import Firestore methods
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 // Fix default marker icon issue in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -20,7 +22,7 @@ const MapView = () => {
   const [locations, setLocations] = useState([]);  // State to hold group members' locations
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
@@ -52,6 +54,7 @@ const MapView = () => {
       } catch (err) {
         console.error('Error fetching group data:', err);
         setError('Failed to load location data');
+        navigate('/Group');
       } finally {
         setLoading(false);
       }
