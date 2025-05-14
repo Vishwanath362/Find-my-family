@@ -11,6 +11,7 @@ import {
   doc,
   setDoc,
   updateDoc,
+  getDoc
 } from 'firebase/firestore';
 import {
   CheckCircle,
@@ -80,7 +81,15 @@ const GroupPage = () => {
 
       // Save groupId to user's Firestore doc
       const userRef = doc(db, 'users', auth.currentUser.uid);
-      await setDoc(userRef, { currentGroupId: docRef.id }, { merge: true });
+      
+      // First check if the user document exists
+      const userSnap = await getDoc(userRef);
+      
+      if (userSnap.exists()) {
+        await updateDoc(userRef, { currentGroupId: docRef.id });
+      } else {
+        await setDoc(userRef, { currentGroupId: docRef.id });
+      }
 
       showMessage(`Group "${groupName}" created successfully!`, 'success');
       setGroupName('');
@@ -128,8 +137,16 @@ const GroupPage = () => {
 
       // Save groupId to user profile
       const userRef = doc(db, 'users', auth.currentUser.uid);
-     // await updateDocDoc(userRef, { currentGroupId: groupDoc.id }, { merge: true });//vs
-     await updateDoc(userRef, { currentGroupId: groupDoc.id });
+      
+      // First check if the user document exists
+      const userSnap = await getDoc(userRef);
+      
+      if (userSnap.exists()) {
+        await updateDoc(userRef, { currentGroupId: groupDoc.id });
+      } else {
+        await setDoc(userRef, { currentGroupId: groupDoc.id });
+      }
+
       showMessage(`Successfully joined group "${joinGroupName}"!`, 'success');
       setJoinGroupName('');
       setJoinPassword('');
@@ -286,6 +303,7 @@ const GroupPage = () => {
                 )}
                 Join Group
               </button>
+
             </div>
           )}
         </div>
