@@ -38,7 +38,7 @@ const Signup = () => {
       await createUserDoc(user);
 
       localStorage.setItem('authToken', user.accessToken);
-      navigate('/');
+      navigate('/group');
     } catch (error) {
       console.error('Signup error:', error);
       setErrorMessage(error.message || 'Something went wrong');
@@ -55,7 +55,7 @@ const Signup = () => {
 
       const token = await user.getIdToken();
       localStorage.setItem('authToken', token);
-      navigate('/');
+      navigate('/group');
     } catch (error) {
       console.error('Google signup error:', error);
       setErrorMessage(error.message || 'Google sign-up failed');
