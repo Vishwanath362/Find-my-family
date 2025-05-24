@@ -35,10 +35,14 @@ const GroupPage = () => {
 
   const navigate = useNavigate();
 
+  // Redirect if user not logged in
   useEffect(() => {
-    if (!auth.currentUser) {
-      navigate('/login');
-    }
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (!user) {
+        navigate('/login');
+      }
+    });
+    return unsubscribe; // cleanup listener
   }, [navigate]);
 
   const showMessage = (text, type) => {
@@ -51,16 +55,20 @@ const GroupPage = () => {
   };
 
   const handleCreateGroup = async () => {
-    if (!groupName || !groupPassword) {
+    const trimmedName = groupName.trim();
+    const trimmedPassword = groupPassword.trim();
+
+    if (!trimmedName || !trimmedPassword) {
       showMessage('Please provide both group name and password.', 'warning');
       return;
     }
 
     setIsLoading(true);
     try {
+      // Check if group exists
       const groupQuery = query(
         collection(db, 'groups'),
-        where('name', '==', groupName)
+        where('name', '==', trimmedName)
       );
       const snapshot = await getDocs(groupQuery);
 
@@ -70,28 +78,25 @@ const GroupPage = () => {
         return;
       }
 
-      // Generate the group id before adding to Firestore
+      // Create group doc
       const docRef = await addDoc(collection(db, 'groups'), {
-        name: groupName,
-        password: groupPassword,
+        name: trimmedName,
+        password: trimmedPassword, // WARNING: Plain text storage is insecure for production!
         createdBy: auth.currentUser.email,
         members: [auth.currentUser.email],
         createdAt: serverTimestamp(),
       });
 
-      // Save groupId to user's Firestore doc
       const userRef = doc(db, 'users', auth.currentUser.uid);
-      
-      // First check if the user document exists
       const userSnap = await getDoc(userRef);
-      
+
       if (userSnap.exists()) {
         await updateDoc(userRef, { currentGroupId: docRef.id });
       } else {
         await setDoc(userRef, { currentGroupId: docRef.id });
       }
 
-      showMessage(`Group "${groupName}" created successfully!`, 'success');
+      showMessage(`Group "${trimmedName}" created successfully!`, 'success');
       setGroupName('');
       setGroupPassword('');
       setTimeout(() => {
@@ -100,13 +105,16 @@ const GroupPage = () => {
     } catch (error) {
       console.error('Error creating group:', error);
       showMessage('Failed to create group. Please try again.', 'error');
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const handleJoinGroup = async () => {
-    if (!joinGroupName || !joinPassword) {
+    const trimmedName = joinGroupName.trim();
+    const trimmedPass = joinPassword.trim();
+
+    if (!trimmedName || !trimmedPass) {
       showMessage('Please provide both group name and password to join.', 'warning');
       return;
     }
@@ -115,8 +123,8 @@ const GroupPage = () => {
     try {
       const groupQuery = query(
         collection(db, 'groups'),
-        where('name', '==', joinGroupName),
-        where('password', '==', joinPassword)
+        where('name', '==', trimmedName),
+        where('password', '==', trimmedPass)
       );
       const snapshot = await getDocs(groupQuery);
 
@@ -129,25 +137,22 @@ const GroupPage = () => {
       const groupDoc = snapshot.docs[0];
       const groupData = groupDoc.data();
 
-      // Add user to members if not already
       if (!groupData.members.includes(auth.currentUser.email)) {
-        const updatedMembers = [...groupData.members, auth.currentUser.email];
-        await updateDoc(groupDoc.ref, { members: updatedMembers });
+        await updateDoc(groupDoc.ref, {
+          members: [...groupData.members, auth.currentUser.email],
+        });
       }
 
-      // Save groupId to user profile
       const userRef = doc(db, 'users', auth.currentUser.uid);
-      
-      // First check if the user document exists
       const userSnap = await getDoc(userRef);
-      
+
       if (userSnap.exists()) {
         await updateDoc(userRef, { currentGroupId: groupDoc.id });
       } else {
         await setDoc(userRef, { currentGroupId: groupDoc.id });
       }
 
-      showMessage(`Successfully joined group "${joinGroupName}"!`, 'success');
+      showMessage(`Successfully joined group "${trimmedName}"!`, 'success');
       setJoinGroupName('');
       setJoinPassword('');
       setTimeout(() => {
@@ -156,9 +161,9 @@ const GroupPage = () => {
     } catch (error) {
       console.error('Error joining group:', error);
       showMessage('Failed to join group. Please try again.', 'error');
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const getMessageIcon = () => {
@@ -207,11 +212,20 @@ const GroupPage = () => {
             {['create', 'join'].map((tab) => (
               <button
                 key={tab}
-                className={`flex-1 py-4 px-6 font-medium text-lg text-center ${activeTab === tab ? 'bg-green-50 text-green-700 border-b-2 border-green-500' : 'text-gray-500 hover:text-green-500 hover:bg-green-50'}`}
+                className={`flex-1 py-4 px-6 font-medium text-lg text-center ${
+                  activeTab === tab
+                    ? 'bg-green-50 text-green-700 border-b-2 border-green-500'
+                    : 'text-gray-500 hover:text-green-500 hover:bg-green-50'
+                }`}
                 onClick={() => setActiveTab(tab)}
+                disabled={isLoading}
               >
                 <div className="flex items-center justify-center">
-                  {tab === 'create' ? <PlusCircle className="mr-2" size={20} /> : <LogIn className="mr-2" size={20} />}
+                  {tab === 'create' ? (
+                    <PlusCircle className="mr-2" size={20} />
+                  ) : (
+                    <LogIn className="mr-2" size={20} />
+                  )}
                   {tab === 'create' ? 'Create Group' : 'Join Group'}
                 </div>
               </button>
@@ -222,35 +236,43 @@ const GroupPage = () => {
           {activeTab === 'create' && (
             <div className="p-8 space-y-6">
               <div>
-                <label className="block text-gray-700 font-medium mb-2">Group Name</label>
+                <label htmlFor="create-group-name" className="block text-gray-700 font-medium mb-2">
+                  Group Name
+                </label>
                 <div className="relative">
                   <Users className="absolute left-3 top-3 text-gray-400" size={18} />
                   <input
+                    id="create-group-name"
                     type="text"
                     placeholder="Unique group name"
                     value={groupName}
                     onChange={(e) => setGroupName(e.target.value)}
                     className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-gray-700 font-medium mb-2">Group Password</label>
+                <label htmlFor="create-group-password" className="block text-gray-700 font-medium mb-2">
+                  Group Password
+                </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 text-gray-400" size={18} />
                   <input
+                    id="create-group-password"
                     type="password"
                     placeholder="Set a password"
                     value={groupPassword}
                     onChange={(e) => setGroupPassword(e.target.value)}
                     className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
               <button
                 onClick={handleCreateGroup}
                 disabled={isLoading}
-                className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 flex items-center justify-center"
+                className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <span className="animate-spin border-2 border-white border-t-transparent rounded-full h-5 w-5 mr-2"></span>
@@ -266,35 +288,43 @@ const GroupPage = () => {
           {activeTab === 'join' && (
             <div className="p-8 space-y-6">
               <div>
-                <label className="block text-gray-700 font-medium mb-2">Group Name</label>
+                <label htmlFor="join-group-name" className="block text-gray-700 font-medium mb-2">
+                  Group Name
+                </label>
                 <div className="relative">
                   <Users className="absolute left-3 top-3 text-gray-400" size={18} />
                   <input
+                    id="join-group-name"
                     type="text"
-                    placeholder="Group to join"
+                    placeholder="Group name"
                     value={joinGroupName}
                     onChange={(e) => setJoinGroupName(e.target.value)}
                     className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-gray-700 font-medium mb-2">Group Password</label>
+                <label htmlFor="join-group-password" className="block text-gray-700 font-medium mb-2">
+                  Group Password
+                </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 text-gray-400" size={18} />
                   <input
+                    id="join-group-password"
                     type="password"
-                    placeholder="Enter password"
+                    placeholder="Password"
                     value={joinPassword}
                     onChange={(e) => setJoinPassword(e.target.value)}
                     className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
               <button
                 onClick={handleJoinGroup}
                 disabled={isLoading}
-                className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 flex items-center justify-center"
+                className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <span className="animate-spin border-2 border-white border-t-transparent rounded-full h-5 w-5 mr-2"></span>
@@ -303,22 +333,23 @@ const GroupPage = () => {
                 )}
                 Join Group
               </button>
-
             </div>
           )}
         </div>
 
         {message && (
-          <div className={`flex items-center justify-between p-4 rounded-lg border-l-4 ${getMessageColor()}`}>
-            <div className="flex items-center">
-              {getMessageIcon()}
-              <span className="ml-2">{message}</span>
-            </div>
+          <div
+            className={`mb-6 border-l-4 p-4 flex items-center space-x-3 ${getMessageColor()}`}
+            role="alert"
+          >
+            {getMessageIcon()}
+            <p className="text-sm font-semibold">{message}</p>
             <button
               onClick={() => setMessage('')}
-              className="text-lg text-gray-600 hover:text-gray-800"
+              aria-label="Close alert"
+              className="ml-auto text-gray-500 hover:text-gray-700"
             >
-              <X size={20} />
+              <X size={16} />
             </button>
           </div>
         )}

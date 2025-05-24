@@ -35,7 +35,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="bg-slate-100 shadow-md">
+    <header className="bg-green-100 shadow-lg ">
       <nav className="container mx-auto px-4 py-4">
         {/* Top bar with logo and burger menu */}
         <div className="flex justify-between items-center">

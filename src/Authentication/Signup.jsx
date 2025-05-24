@@ -1,34 +1,63 @@
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { auth, googleProvider } from '../firebase';
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithPopup 
+} from 'firebase/auth';
+import { auth, googleProvider, db } from '../firebase'; // make sure db is exported from your firebase config
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { doc, setDoc } from 'firebase/firestore';
+
 const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
+  // Helper: create user doc in Firestore
+  const createUserDoc = async (user) => {
+    try {
+      await setDoc(doc(db, 'users', user.uid), {
+        email: user.email,
+        createdAt: new Date(),
+        currentGroupId: null,
+      });
+    } catch (error) {
+      console.error('Error creating user document:', error);
+    }
+  };
+
   const handleSignup = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+
+      await createUserDoc(user);
+
       localStorage.setItem('authToken', user.accessToken);
       navigate('/');
     } catch (error) {
-      setErrorMessage('Something went wrong');
+      console.error('Signup error:', error);
+      setErrorMessage(error.message || 'Something went wrong');
     }
   };
 
   const handleGoogleSignup = async () => {
+    setErrorMessage('');
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      const token = await result.user.getIdToken();
+      const user = result.user;
+
+      await createUserDoc(user);
+
+      const token = await user.getIdToken();
       localStorage.setItem('authToken', token);
       navigate('/');
     } catch (error) {
+      console.error('Google signup error:', error);
       setErrorMessage(error.message || 'Google sign-up failed');
     }
   };
@@ -79,10 +108,8 @@ const Signup = () => {
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
             Already have an account?{' '}
-            <Link to= "/login">
-            <button href="/login" className="text-green-500 hover:underline">
-              Login
-            </button>
+            <Link to="/login">
+              <button className="text-green-500 hover:underline">Login</button>
             </Link>
           </p>
         </div>
