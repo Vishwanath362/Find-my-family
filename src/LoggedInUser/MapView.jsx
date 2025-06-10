@@ -26,6 +26,7 @@ const MapView = () => {
   const [chatMessages, setChatMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [localMembers, setLocalMembers] = useState([]);
   // const navigate = useNavigate();
   const messagesEndRef = useRef(null);
 
@@ -84,6 +85,7 @@ const MapView = () => {
             latitude: location.latitude,
             longitude: location.longitude,
           }));
+         
           setLocations(groupLocations);
         }
 
@@ -210,12 +212,14 @@ const MapView = () => {
               </svg>
             </div>
             <p className="text-red-300 text-lg font-medium mb-4">{error}</p>
+            <Link to ="/Group">
             <button
               onClick={() => {/* navigate('/Group') */ }}
               className="px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-300 font-medium rounded-lg transition-all duration-300 border border-red-500/30"
             >
               Go Back
             </button>
+            </Link>
           </div>
         </div>
       </div>

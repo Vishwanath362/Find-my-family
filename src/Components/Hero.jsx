@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Shield, Zap, Users, ArrowRight, Play } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import { db, auth } from '../firebase';
+
 const Hero = () => {
     const [user, setUser] = useState(null);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -12,7 +14,9 @@ const Hero = () => {
         //     setUser(user);
         // });
         // return () => unsubscribe();
-
+        if(auth.currentUser){
+            setUser(auth.currentUser)
+        }
         const handleMouseMove = (e) => {
             setMousePosition({
                 x: (e.clientX / window.innerWidth) * 100,
@@ -84,11 +88,13 @@ const Hero = () => {
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row gap-4">
                         {user ? (
+                            <Link to ="/MapView">
                             <button className="group flex items-center justify-center px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/25">
                                 <MapPin size={20} className="mr-2" />
                                 View Family Map
                                 <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                             </button>
+                            </Link>
                         ) : (
                             <>
 
@@ -152,9 +158,9 @@ const Hero = () => {
                                     {/* Family Members List */}
                                     <div className="space-y-3">
                                         {[
-                                            { name: 'Sarah', status: 'At Work', color: 'emerald' },
-                                            { name: 'Mike', status: 'At School', color: 'blue' },
-                                            { name: 'Emma', status: 'At Home', color: 'purple' }
+                                            { name: 'Dad', status: 'At Work', color: 'emerald' },
+                                            { name: 'Brother', status: 'At School', color: 'blue' },
+                                            { name: 'Mom', status: 'At Home', color: 'purple' }
                                         ].map((member, i) => (
                                             <div key={i} className="flex items-center space-x-3 p-3 bg-white/5 rounded-xl">
                                                 <div className={`w-3 h-3 bg-${member.color}-400 rounded-full`}></div>
@@ -173,7 +179,7 @@ const Hero = () => {
                         </div>
 
                         {/* Floating Cards */}
-                        <div className="absolute -top-4 -right-4 bg-emerald-500/10 backdrop-blur-sm border border-emerald-500/20 rounded-xl p-4 animate-pulse">
+                        <div className="absolute -top-4 -right-4  bg-emerald-500/10 backdrop-blur-sm border border-emerald-500/20 rounded-xl p-4 animate-pulse">
                             <Shield size={24} className="text-emerald-400" />
                         </div>
                         <div className="absolute -bottom-4 -left-4 bg-blue-500/10 backdrop-blur-sm border border-blue-500/20 rounded-xl p-4 animate-pulse" style={{ animationDelay: '1s' }}>
