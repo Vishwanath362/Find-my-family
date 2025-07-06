@@ -12,7 +12,7 @@ import MapView from './LoggedInUser/MapView';
 import ViewLocations from './LoggedInUser/ViewLocations';  // Import the new component
 import Group from './LoggedInUser/Group';
 import AboutUs from './Components/AboutUs';
-// import AboutUs from './Components/AboutUs';
+
 function App() {
   return (
     <div className="font-sans"> {/* Apply font-sans (Inter, if added via Tailwind config) */}

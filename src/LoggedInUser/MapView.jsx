@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { db, auth } from '../firebase';
-import { doc, getDoc, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, and } from 'firebase/firestore';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-// import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { MapPin, MessageCircle, Users, Signal, Send, MoreVertical, Shield, Zap } from 'lucide-react';
-
+import { onAuthStateChanged } from 'firebase/auth';
 // Fix Leaflet marker icon path issue
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -19,6 +20,7 @@ L.Icon.Default.mergeOptions({
 });
 
 const MapView = () => {
+ // const [user, setUser] = useState(null); // testing
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,9 +35,29 @@ const MapView = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+  //  useEffect(() => {
+  //   const checkAuth = async () => {
+  //     // Give Firebase time to restore the session
+  //     await new Promise((res) => setTimeout(res, 200));
+
+  //     const user = auth.currentUser;
+
+  //     if (user) {
+  //       const token = await user.getIdToken();
+  //       localStorage.setItem('authtoken', token);
+  //       setLoading(false); // User is valid
+  //     } else {
+  //       //navigate('/login'); // Not logged in
+         
+  //     }
+  //   };
+
+  //   checkAuth();
+  // }, []);
 
   useEffect(() => {
     // Mouse tracking for dynamic background
+    
     const handleMouseMove = (e) => {
       setMousePosition({
         x: (e.clientX / window.innerWidth) * 100,
@@ -44,8 +66,9 @@ const MapView = () => {
     };
 
     window.addEventListener('mousemove', handleMouseMove);
+   
 
-    if (!auth.currentUser) {
+    if (!auth.currentUser  ) {
       setError("You must be logged in.");
       setLoading(false);
       return;
@@ -214,7 +237,7 @@ const MapView = () => {
             <p className="text-red-300 text-lg font-medium mb-4">{error}</p>
             <Link to ="/Group">
             <button
-              onClick={() => {/* navigate('/Group') */ }}
+              onClick={() => { navigate('/Group')  }}
               className="px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-300 font-medium rounded-lg transition-all duration-300 border border-red-500/30"
             >
               Go Back
@@ -419,7 +442,7 @@ const MapView = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-2">
                           <span className="font-semibold text-emerald-400">{msg.senderName}</span>
-                          <span className="text-xs text-gray-500">now</span>
+                          <span className="text-xs text-gray-500">{msg.timestamp ? msg.timestamp.toDate().toLocaleString() : 'No time'}</span>
                         </div>
                         <div className="bg-white/5 rounded-2xl px-4 py-3 border border-white/10">
                           <p className="text-gray-200 leading-relaxed break-words">{msg.message}</p>

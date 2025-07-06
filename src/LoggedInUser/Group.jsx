@@ -80,10 +80,7 @@ const GroupPage = () => {
     setIsLoading(true);
     try {
       // Check if group exists
-      const groupQuery = query(
-        collection(db, 'groups'),
-        where('name', '==', trimmedName)
-      );
+      const groupQuery = query(collection(db, 'groups'),where('name', '==', trimmedName));
       const snapshot = await getDocs(groupQuery);
 
       if (!snapshot.empty) {

@@ -1,8 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Users, MapPin, CheckSquare, Shield, Zap, Sparkles } from 'lucide-react';
-
+import { auth } from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 export default function AboutUs() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+// useEffect(() => {
+//   const unsubscribe = onAuthStateChanged(auth, async (user) => {
+//     if (user) {
+//       const token = await user.getIdToken();
+//       localStorage.setItem('authtoken', token);
+//       console.log('User is signed in:', user.email);
+//     } else {
+//       console.log('No user is signed in');
+//     }
+//   });
+
+//   return () => unsubscribe();
+// }, []);
 
   useEffect(() => {
     const handleMouseMove = (e) => {

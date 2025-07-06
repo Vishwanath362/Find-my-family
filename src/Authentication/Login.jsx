@@ -27,7 +27,7 @@ const Login = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const token = await userCredential.user.getIdToken();
       localStorage.setItem('authToken', token);
-      navigate('/group');  // make sure your route is lowercase `/group`
+      navigate('/group'); 
     } catch (error) {
       console.error('Login error:', error);
       setErrorMessage('Invalid email or password');

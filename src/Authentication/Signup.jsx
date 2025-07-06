@@ -36,7 +36,7 @@ const Signup = () => {
     setIsVisible(true);
   }, []);
 
-  // Password strength checker
+  
   useEffect(() => {
     let strength = 0;
     if (password.length >= 8) strength++;
