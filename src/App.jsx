@@ -9,10 +9,9 @@ import Login from './Authentication/Login';
 import Signup from './Authentication/Signup';
 import ShareLocation from './LoggedInUser/ShareLocation';
 import MapView from './LoggedInUser/MapView';
-import ViewLocations from './LoggedInUser/ViewLocations';  // Import the new component
+import ViewLocations from './LoggedInUser/ViewLocations'; 
 import Group from './LoggedInUser/Group';
 import AboutUs from './Components/AboutUs';
-
 function App() {
   return (
     <div className="font-sans"> {/* Apply font-sans (Inter, if added via Tailwind config) */}
