@@ -12,10 +12,13 @@ import MapView from './LoggedInUser/MapView';
 import ViewLocations from './LoggedInUser/ViewLocations'; 
 import Group from './LoggedInUser/Group';
 import AboutUs from './Components/AboutUs';
+import { AuthContextProvider } from './context';
 function App() {
   return (
     <div className="font-sans"> {/* Apply font-sans (Inter, if added via Tailwind config) */}
+      
       <Router>
+        <AuthContextProvider>
         <Navbar />
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -28,6 +31,7 @@ function App() {
           <Route path="/" element={<><Hero /><Features /><Testimonials /></>} />
         </Routes>
         <Footer />
+      </AuthContextProvider>
       </Router>
     </div>
   );

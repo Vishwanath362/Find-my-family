@@ -36,7 +36,8 @@ const GroupPage = () => {
   const [messageType, setMessageType] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
-  const navigate = useNavigate()
+  // const window.location.href = usewindow.location.href()
+  const navigate = useNavigate();
   useEffect(() => {
     const handleMouseMove = (e) => {
       setMousePosition({

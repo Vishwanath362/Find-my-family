@@ -73,7 +73,7 @@ const ShareLocation = () => {
 
     if (!groupId) {
       setError("Group ID not found. Please try again from the group join page.");
-      navigate("/Group");
+      window.location.href = "/Group";
       return;
     }
 
@@ -115,7 +115,7 @@ const ShareLocation = () => {
 
       setIsLoading(false);
       alert("📍 Location shared to your group!");
-      navigate("/MapView");
+      window.location.href = ("/MapView");
     } catch (error) {
       setIsLoading(false);
       console.error("Error sharing location:", error);

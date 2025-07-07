@@ -4,10 +4,11 @@ import { doc, getDoc, collection, addDoc, onSnapshot, query, orderBy, serverTime
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
+
 import { MapPin, MessageCircle, Users, Signal, Send, MoreVertical, Shield, Zap } from 'lucide-react';
-import { onAuthStateChanged } from 'firebase/auth';
+
+import { useAuthContext } from '../context';
 // Fix Leaflet marker icon path issue
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -21,16 +22,12 @@ L.Icon.Default.mergeOptions({
 
 const MapView = () => {
  // const [user, setUser] = useState(null); // testing
-  const [locations, setLocations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [groupName, setGroupName] = useState("null");
-  const [chatMessages, setChatMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [localMembers, setLocalMembers] = useState([]);
+  const navigate = useNavigate();
+  // const [localMembers, setLocalMembers] = useState([]);
   // const navigate = useNavigate();
   const messagesEndRef = useRef(null);
+  const {locations, loading, error, groupName, chatMessages, mousePosition} = useAuthContext();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -55,86 +52,7 @@ const MapView = () => {
   //   checkAuth();
   // }, []);
 
-  useEffect(() => {
-    // Mouse tracking for dynamic background
-    
-    const handleMouseMove = (e) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth) * 100,
-        y: (e.clientY / window.innerHeight) * 100,
-      });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-   
-
-    if (!auth.currentUser  ) {
-      setError("You must be logged in.");
-      setLoading(false);
-      return;
-    }
-
-    const fetchGroupData = async () => {
-      try {
-        const userRef = doc(db, 'users', auth.currentUser.uid);
-        const userSnap = await getDoc(userRef);
-        if (!userSnap.exists()) {
-          setError("User data not found.");
-          setLoading(false);
-          return;
-        }
-
-        const groupId = userSnap.data().currentGroupId;
-        if (!groupId) {
-          setError('You are not part of any group.');
-          setLoading(false);
-          return;
-        }
-
-        const groupRef = doc(db, 'groups', groupId);
-        const groupSnap = await getDoc(groupRef);
-        if (!groupSnap.exists()) {
-          setError('Group data not found.');
-          setLoading(false);
-          return;
-        }
-
-        const groupData = groupSnap.data();
-        setGroupName(groupData.name || "Unnamed Group");
-
-        if (groupData?.locations) {
-          const groupLocations = groupData.locations.map(location => ({
-            name: location.name,
-            latitude: location.latitude,
-            longitude: location.longitude,
-          }));
-         
-          setLocations(groupLocations);
-        }
-
-        const messagesRef = collection(db, 'groups', groupId, 'messages');
-        const q = query(messagesRef, orderBy('timestamp'));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-          setChatMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        }, (error) => {
-          console.error("Snapshot listener error:", error);
-          setError("Permission denied or unable to load messages.");
-        });
-
-        setLoading(false);
-        return () => unsubscribe();
-      } catch (err) {
-        console.error('Error fetching group data:', err);
-        setError('Failed to load location data');
-        setLoading(false);
-        // navigate('/Group');
-      }
-    };
-
-    fetchGroupData();
-
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  
 
   useEffect(scrollToBottom, [chatMessages]);
 
