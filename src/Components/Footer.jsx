@@ -55,7 +55,7 @@ const Footer = () => {
                   <MapPin size={24} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-white">MyFamilyApp</h3>
+                  <h3 className="text-2xl font-bold text-white">FindMyFamily</h3>
                   <p className="text-emerald-300 text-sm">Stay Connected, Stay Safe</p>
                 </div>
               </div>
@@ -131,7 +131,7 @@ const Footer = () => {
               </h4>
               <div className="space-y-4">
                 {[
-                  { icon: Mail, text: 'hello@myfamilyapp.com', href: 'mailto:hello@myfamilyapp.com' },
+                  { icon: Mail, text: 'hello@FindMyFamily.com', href: 'mailto:hello@FindMyFamily.com' },
                   { icon: Phone, text: '+1 (555) 123-4567', href: 'tel:+15551234567' },
                   { icon: MessageCircle, text: 'Live Chat', href: '#' }
                 ].map((contact, i) => (
@@ -159,7 +159,7 @@ const Footer = () => {
         }`}>
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-gray-400 text-sm">
-              © {new Date().getFullYear()} MyFamilyApp. All rights reserved. Made with 
+              © {new Date().getFullYear()} FindMyFamily. All rights reserved. Made with 
               <Heart size={14} className="inline mx-1 text-red-400" />
               for families everywhere.
             </div>
