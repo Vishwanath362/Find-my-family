@@ -48,7 +48,7 @@ const Navbar = () => {
                 </svg>
               </div>
               <h3 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent group-hover:from-emerald-500 group-hover:to-teal-500 transition-all duration-300">
-                My Family App
+               Find My Family
               </h3>
             </div>
           </Link>

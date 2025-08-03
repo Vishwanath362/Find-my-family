@@ -5,9 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from "../firebase";
 import { doc, getDoc, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, and } from 'firebase/firestore';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { MapPin, MessageCircle, Users, Signal, Send, MoreVertical, Shield, Zap } from 'lucide-react';
 
 const AuthContext = createContext({});
 
