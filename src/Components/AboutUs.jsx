@@ -83,7 +83,7 @@ export default function AboutUs() {
               <h1 className="text-6xl lg:text-8xl font-light text-white mb-8 tracking-tight">
                 About
                 <span className="block font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                  MyFamilyApp
+                  FindMyFamily
                 </span>
               </h1>
               <p className="text-2xl text-gray-300 max-w-4xl mx-auto font-light leading-relaxed">
@@ -105,7 +105,7 @@ export default function AboutUs() {
                   </div>
                   <div className="space-y-6 text-lg text-gray-300 leading-relaxed">
                     <p className="text-emerald-300 font-semibold">
-                      MyFamilyApp was born from a simple, real-life frustration.
+                      FindMyFamily was born from a simple, real-life frustration.
                     </p>
                     <p>
                       As a university student, I often faced confusion when my father came to pick me up after college—network issues delayed calls, and timing mismatches led to unnecessary stress.
@@ -167,7 +167,7 @@ export default function AboutUs() {
                     </div>
                     <h2 className="text-4xl font-bold text-white">What We Do</h2>
                   </div>
-                  <p className="text-xl text-emerald-300 font-semibold">MyFamilyApp helps you:</p>
+                  <p className="text-xl text-emerald-300 font-semibold">FindMyFamily helps you:</p>
                   <div className="space-y-4">
                     {[
                       'Create groups of family or friends.',

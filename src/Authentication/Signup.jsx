@@ -138,7 +138,7 @@ const Signup = () => {
                 <MapPin size={24} className="text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">MyFamilyApp</h1>
+                <h1 className="text-2xl font-bold text-white">FindMyFamily</h1>
                 <p className="text-emerald-300 text-sm">Stay Connected, Stay Safe</p>
               </div>
             </div>
