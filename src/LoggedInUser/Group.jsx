@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import bcrypt from 'bcryptjs';
 import { db, auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -81,7 +82,7 @@ const GroupPage = () => {
     setIsLoading(true);
     try {
       // Check if group exists
-      const groupQuery = query(collection(db, 'groups'),where('name', '==', trimmedName));
+      const groupQuery = query(collection(db, 'groups'), where('name', '==', trimmedName));
       const snapshot = await getDocs(groupQuery);
 
       if (!snapshot.empty) {
@@ -90,10 +91,14 @@ const GroupPage = () => {
         return;
       }
 
+      // Hash the password before storing
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(trimmedPassword, salt);
+
       // Create group doc
       const docRef = await addDoc(collection(db, 'groups'), {
         name: trimmedName,
-        password: trimmedPassword, // WARNING: Plain text storage is insecure for production!
+        password: hashedPassword,
         createdBy: auth.currentUser.email,
         members: [auth.currentUser.email],
         createdAt: serverTimestamp(),
@@ -133,10 +138,10 @@ const GroupPage = () => {
 
     setIsLoading(true);
     try {
+      // Find group by name only (password is hashed)
       const groupQuery = query(
         collection(db, 'groups'),
-        where('name', '==', trimmedName),
-        where('password', '==', trimmedPass)
+        where('name', '==', trimmedName)
       );
       const snapshot = await getDocs(groupQuery);
 
@@ -148,6 +153,14 @@ const GroupPage = () => {
 
       const groupDoc = snapshot.docs[0];
       const groupData = groupDoc.data();
+
+      // Compare password using bcrypt
+      const passwordMatch = await bcrypt.compare(trimmedPass, groupData.password);
+      if (!passwordMatch) {
+        showMessage('Group not found or incorrect password.', 'error');
+        setIsLoading(false);
+        return;
+      }
 
       if (!groupData.members.includes(auth.currentUser.email)) {
         await updateDoc(groupDoc.ref, {
