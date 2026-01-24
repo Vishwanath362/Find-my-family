@@ -106,7 +106,7 @@ export const AuthContextProvider = ({children})=>{
               const groupRef = doc(db, 'groups', groupId);
               const groupSnap = await getDoc(groupRef);
               if (!groupSnap.exists()) {
-                setError('Group data not found.');
+                setError('Join or Create a Group First.');
                 setLoading(false);
                 return;
               }

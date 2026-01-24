@@ -92,8 +92,7 @@ const GroupPage = () => {
       }
 
 
-      // TODO: Hash the password on the backend before storing for security.
-      const hashedPassword = trimmedPassword; // Placeholder: send plain password to backend for hashing
+      const hashedPassword = trimmedPassword; 
 
       // Create group doc
       const docRef = await addDoc(collection(db, 'groups'), {
