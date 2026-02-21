@@ -14,7 +14,7 @@ const Hero = () => {
         //     setUser(user);
         // });
         // return () => unsubscribe();
-        if(auth.currentUser){
+        if (auth.currentUser) {
             setUser(auth.currentUser)
         }
         const handleMouseMove = (e) => {
@@ -88,12 +88,12 @@ const Hero = () => {
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row gap-4">
                         {user ? (
-                            <Link to ="/MapView">
-                            <button className="group flex items-center justify-center px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/25">
-                                <MapPin size={20} className="mr-2" />
-                                View Family Map
-                                <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                            </button>
+                            <Link to="/MapView">
+                                <button className="group flex items-center justify-center px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/25">
+                                    <MapPin size={20} className="mr-2" />
+                                    View Family Map
+                                    <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                                </button>
                             </Link>
                         ) : (
                             <>
@@ -104,11 +104,12 @@ const Hero = () => {
                                         <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                                     </button>
                                 </Link>
-
-                                <button className="group flex items-center justify-center px-8 py-4 border border-white/20 hover:border-white/40 text-white font-medium rounded-lg transition-all duration-300 hover:bg-white/5">
-                                    <Play size={16} className="mr-2" />
-                                    Watch Demo
-                                </button>
+                                <Link to="https://www.linkedin.com/posts/vis1_reactjs-firebase-tailwindcss-activity-7338084357741400065-UBTl?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAEf9Lb8B3SG2V3qkyKatjFafVMtaCP37mWI">
+                                    <button className="group flex items-center justify-center px-8 py-4 border border-white/20 hover:border-white/40 text-white font-medium rounded-lg transition-all duration-300 hover:bg-white/5">
+                                        <Play size={16} className="mr-2" />
+                                        Watch Demo
+                                    </button>
+                                </Link>
                             </>
                         )}
                     </div>

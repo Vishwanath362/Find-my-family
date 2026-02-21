@@ -82,8 +82,8 @@ const Footer = () => {
               <div className="flex space-x-4">
                 {[
                   { icon: Twitter, href: '#', label: 'Twitter' },
-                  { icon: Linkedin, href: '#', label: 'LinkedIn' },
-                  { icon: Github, href: '#', label: 'GitHub' }
+                  { icon: Linkedin, href: 'https://www.linkedin.com/posts/vis1_reactjs-firebase-tailwindcss-activity-7338084357741400065-UBTl?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAEf9Lb8B3SG2V3qkyKatjFafVMtaCP37mWI', label: 'LinkedIn' },
+                  { icon: Github, href: 'https://github.com/Vishwanath362/Find-my-family', label: 'GitHub' }
                 ].map((social, i) => (
                   <a
                     key={i}
