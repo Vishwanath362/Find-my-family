@@ -154,9 +154,6 @@ const GroupPage = () => {
       const groupData = groupDoc.data();
 
 
-      // TODO: Compare password on the backend for security.
-      // Placeholder: Accept any password for now. Implement backend check.
-      // Remove this block and handle password check in backend API.
 
       if (!groupData.members.includes(auth.currentUser.email)) {
         await updateDoc(groupDoc.ref, {

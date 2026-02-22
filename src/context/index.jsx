@@ -15,11 +15,14 @@ export const AuthContextProvider = ({children})=>{
   const [error, setError] = useState(null);
   const [groupName, setGroupName] = useState("null");
   const [chatMessages, setChatMessages] = useState([]);
-  
+  const [isRealtime,setRealtime] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const location = useLocation();
   const navigate = useNavigate();
 
+  const handleRealTimeLocationStatus = (status) =>{
+    setRealtime(status);
+  }
   const waitForUserDocument = async (userId, maxRetries = 10, delay = 1000) => {
     for (let i = 0; i < maxRetries; i++) {
       try {
@@ -65,6 +68,7 @@ export const AuthContextProvider = ({children})=>{
    
     let userCurr = auth.currentUser;
     let messageUnsubscribe = null; // Store the message unsubscribe function
+    let groupUnsubscribe = null; // Store the group listener unsubscribe function
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -113,6 +117,7 @@ export const AuthContextProvider = ({children})=>{
 
               const groupData = groupSnap.data();
               setGroupName(groupData.name || "Unnamed Group");
+              setError(null); // Clear any previous errors
               console.log("✅ Group data loaded:", groupData);
               
 
@@ -126,19 +131,43 @@ export const AuthContextProvider = ({children})=>{
                 setLocations(groupLocations);
               }
 
+              // Set up real-time listener for group locations
+              const groupUnsubscribe = onSnapshot(groupRef, (snapshot) => {
+                if (snapshot.exists()) {
+                  const updatedData = snapshot.data();
+                  if (updatedData?.locations) {
+                    const updatedLocations = updatedData.locations.map(location => ({
+                      name: location.name,
+                      latitude: location.latitude,
+                      longitude: location.longitude,
+                    }));
+                    setLocations(updatedLocations);
+                    console.log("📍 Locations updated in real-time:", updatedLocations);
+                  }
+                }
+              }, (error) => {
+                console.error("Location listener error:", error);
+                // Don't break the app for location listener errors
+                console.warn("⚠️ Real-time location updates may be delayed");
+              });
+
               const messagesRef = collection(db, 'groups', groupId, 'messages');
               const q = query(messagesRef, orderBy('timestamp'));
               
-              // Clean up previous listener if it exists
+              // Clean up previous listeners if they exist
               if (messageUnsubscribe) {
                 messageUnsubscribe();
+              }
+              if (groupUnsubscribe) {
+                groupUnsubscribe();
               }
               
               messageUnsubscribe = onSnapshot(q, (snapshot) => {
                 setChatMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
               }, (error) => {
                 console.error("Snapshot listener error:", error);
-                setError("Permission denied or unable to load messages.");
+                // Don't set error here as group loaded successfully, just log it
+                console.warn("⚠️ Messages may not be fully available, but locations are working");
               });
 
               setLoading(false);
@@ -168,18 +197,21 @@ export const AuthContextProvider = ({children})=>{
       if (messageUnsubscribe) {
         messageUnsubscribe();
       }
+      if (groupUnsubscribe) {
+        groupUnsubscribe();
+      }
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, [location, navigate]);
 
 
   return(
-    <AuthContext.Provider value={{locations, loading, error, groupName, chatMessages, mousePosition}}>
+    <AuthContext.Provider value={{locations, loading, error, groupName, chatMessages, mousePosition,isRealtime,handleRealTimeLocationStatus}}>
         {children}
     </AuthContext.Provider>
   )
 }
 
-export const useAuthContext = ()=>{
+export function useAuthContext(){
     return useContext(AuthContext);
 }

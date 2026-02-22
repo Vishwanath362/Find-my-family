@@ -27,7 +27,7 @@ const MapView = () => {
   // const [localMembers, setLocalMembers] = useState([]);
   // const navigate = useNavigate();
   const messagesEndRef = useRef(null);
-  const {locations, loading, error, groupName, chatMessages, mousePosition} = useAuthContext();
+  const {locations, loading, error, groupName, chatMessages, mousePosition,isRealtime,handleRealTimeLocationStatus} = useAuthContext();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -263,6 +263,24 @@ const MapView = () => {
                   <span className="text-gray-300">{locations.length} Members</span>
                 </div>
               </div>
+              {isRealtime && <button
+                onClick={() => {
+                  if (window.__realtimeWatchId !== undefined && window.__realtimeWatchId !== null) {
+                    navigator.geolocation.clearWatch(window.__realtimeWatchId);
+                    window.__realtimeWatchId = null;
+                    handleRealTimeLocationStatus(false);
+                    alert("Real-time tracking stopped.");
+                  } else {
+                    alert("No active real-time tracking.");
+                  }
+                }}
+                className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 font-semibold rounded-lg transition-all duration-300 border border-red-500/30 text-sm"
+              >
+
+                <Zap className="w-4 h-4 inline mr-2" />
+                Stop Real-Time
+              </button>
+              }
             </div>
           </div>
         </div>
